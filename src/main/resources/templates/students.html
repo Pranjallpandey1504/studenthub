@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Student List</title>
+    <style>
+       
+        body, html {
+            height: 100%;
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #6B73FF 0%, #000DFF 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        body {
+            padding: 0;
+        }
+
+        .container {
+            background: white;
+            padding: 30px 40px;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+            max-width: 700px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 25px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+        }
+
+        form {
+            margin-bottom: 30px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 15px;
+        }
+
+        input[type="text"],
+        input[type="email"] {
+            flex: 1 1 45%;
+            padding: 10px 15px;
+            font-size: 1rem;
+            border: 2px solid #6B73FF;
+            border-radius: 8px;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus,
+        input[type="email"]:focus {
+            outline: none;
+            border-color: #000DFF;
+            box-shadow: 0 0 6px #000DFF;
+        }
+
+        button {
+            flex: 1 1 30%;
+            background-color: #000DFF;
+            color: white;
+            border: none;
+            padding: 12px 0;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #6B73FF;
+        }
+
+        button[type="button"] {
+            background-color: #999;
+        }
+
+        button[type="button"]:hover {
+            background-color: #666;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        th, td {
+            padding: 15px 20px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+            color: #333;
+        }
+
+        th {
+            background-color: #000DFF;
+            color: white;
+            text-transform: uppercase;
+            font-weight: 700;
+        }
+
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        a {
+            color: #000DFF;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        .error {
+            color: red;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Student List</h1>
+
+        <!-- Add/Edit Student Form -->
+        <form th:action="@{/students/add}" method="post" id="studentForm" onsubmit="return validateForm()">
+            <input type="hidden" name="id" th:value="${studentToEdit != null} ? ${studentToEdit.id} : ''" />
+            <input type="text" name="name" placeholder="Name" required
+                   th:value="${studentToEdit != null} ? ${studentToEdit.name} : ''" />
+            <input type="email" name="email" placeholder="Email" required
+                   th:value="${studentToEdit != null} ? ${studentToEdit.email} : ''" />
+            <input type="text" name="course" placeholder="Course" required
+                   th:value="${studentToEdit != null} ? ${studentToEdit.course} : ''" />
+            <button type="submit" th:text="${studentToEdit != null} ? 'Update Student' : 'Add Student'">Add Student</button>
+            <button type="button" onclick="window.location.href='/students'">Clear</button>
+        </form>
+
+        <!--Student Table -->
+        <table>
+            <tr>
+                <th>ID</th><th>Name</th><th>Email</th><th>Course</th><th>Actions</th>
+            </tr>
+            <tr th:each="student : ${students}">
+                <td th:text="${student.id}"></td>
+                <td th:text="${student.name}"></td>
+                <td th:text="${student.email}"></td>
+                <td th:text="${student.course}"></td>
+                <td>
+                    <a th:href="@{/students/edit/{id}(id=${student.id})}">Edit</a> |
+                    <a th:href="@{/students/delete/{id}(id=${student.id})}" onclick="return confirm('Are you sure?');">Delete</a>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <script>
+        function validateForm() {
+            const form = document.getElementById('studentForm');
+            const name = form.name.value.trim();
+            const email = form.email.value.trim();
+            const course = form.course.value.trim();
+            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+            if (name.length < 2) {
+                alert('Name must be at least 2 characters long.');
+                return false;
+            }
+            if (!emailPattern.test(email)) {
+                alert('Please enter a valid email address.');
+                return false;
+            }
+            if (course.length < 2) {
+                alert('Course must be at least 2 characters long.');
+                return false;
+            }
+            return true;
+        }
+    </script>
+</body>
+</html>
